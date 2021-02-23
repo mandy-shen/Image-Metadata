@@ -97,9 +97,9 @@ async function readURL(input) {
 				(++cnt);
 				if (cnt>=input.files.length) {
 					let time = new Date().getTime() - start;
-					alert('total time consuming: ', time, 
-						'\ntotal photo: ', input.files.length, 
-						'\neach photo: ', time/input.files.length);
+					alert('total time consuming: ' + time + 'ms'
+						+ '\ntotal photo: ' + input.files.length
+						+ '\neach photo: ' + time/input.files.length + 'ms');
 				}
 			});
 		});
