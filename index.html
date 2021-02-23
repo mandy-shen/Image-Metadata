@@ -1,0 +1,150 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+<title>CSYE6225_HW2_Retrieve_Photo_Metadata_Mandy</title> 
+<style>
+.left {
+  display: inline-block;
+  width: 100px;
+}
+img {
+  width: 150px;
+}
+</style>
+</head> 
+<body>
+
+<form runat="server">
+<p>
+	<text>Please upload at least one image:</text></br>
+	<input type='file' id="imgInp" multiple/>
+</p>
+<p>
+	Show Images:<text id="show"></text>
+</p>
+</form>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+<script>
+var start;
+let cnt = 0;
+
+async function readURL(input) {
+
+	const label = $("<label class=left></label>");
+	const text = $("<text></text>");
+	const img = $("<img>");
+	const br = $("</br>");
+	const p = $("<p></p>");
+	const show = $("#show");
+	
+	$("#show p").remove();
+	cnt = 0;
+
+    if (input.files) {
+
+		$.each(input.files, function(i, file){
+			
+			let child = p.clone();
+			child.append(label.clone().html("Image " + (i+1).pad(5) + ":"))
+			.append(img.clone().attr("id", "img"+i))
+			.append(br.clone());
+
+			child.append(label.clone().html("User File:"))
+			.append(text.clone().html(file.name))
+			.append(br.clone());
+			
+			child.append(label.clone().html("Location:"))
+			.append(text.clone().attr("id", "loc"+i))
+			.append(text.clone().attr("id", "gpsFull"+i))
+			.append(br.clone());
+			
+			child.append(label.clone().html("Data Taken:"))
+			.append(text.clone().attr("id", "date"+i))
+			.append(br.clone());
+
+			child.append(label.clone().html("Device Used:"))
+			.append(text.clone().attr("id", "device"+i))
+			.append(br.clone());
+			
+			show.append(child);
+		
+			let reader = new FileReader();
+			reader.onload = (e) => {$("#img"+i).attr("src", e.target.result)};
+			reader.readAsDataURL(file);
+			
+			
+			EXIF.getData(file, async function() {
+				let gps = {};
+				gps.lat    = EXIF.getTag(this, "GPSLatitude");
+				gps.latRef = EXIF.getTag(this, "GPSLatitudeRef");
+				gps.lon    = EXIF.getTag(this, "GPSLongitude");
+				gps.lonRef = EXIF.getTag(this, "GPSLongitudeRef");
+				$("#gpsFull"+i).html(gpsFullformat(gps));
+				$("#loc"+i).html("test, US");
+				//$("#loc"+i).html(await fetchLoc(gps));
+				
+				let gpsDateStamp = EXIF.getTag(this, "GPSDateStamp");
+				$("#date"+i).html(dateformat(gpsDateStamp));
+				
+				let make  = EXIF.getTag(this, "Make");
+				let model = EXIF.getTag(this, "Model");
+				$("#device"+i).html(make + " " + model);
+
+				(++cnt);
+				if (cnt>=input.files.length)
+					console.log('time:', new Date().getTime() - start);
+			});
+		});
+    }
+}
+
+  
+$("#imgInp").change(function() {
+	start = new Date().getTime();
+
+	readURL(this);
+});
+
+
+async function fetchLoc(gps) {
+	let latnum = gpsDegToDeci(gps.lat, gps.latRef);
+	let lonnum = gpsDegToDeci(gps.lon, gps.lonRef);
+	let url = "https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+latnum+"&longitude="+lonnum+"&localityLanguage=en";
+	let response = await fetch(url);
+	let json = await response.json();
+	return json.city+", "+ json.countryName;
+}
+
+Number.prototype.pad = function(size) {
+	let str = String(this);
+	while (str.length < (size || 2)) {str = "0" + str;}
+	return str;
+}
+
+function gpsDegToDeci(array, ref) {
+	let min = array[1] + array[2]/60;
+	let decimal = (array[0] + min/60).toFixed(4);
+	return (ref=='N'||ref=='E') ? decimal : decimal*(-1);
+}
+
+function gpsformat(array, ref) {
+	let gpsnum = gpsDegToDeci(array, ref);
+	return Math.abs(gpsnum) + "° " + ref;
+}
+
+function gpsFullformat(gps) {
+	let lat = gpsformat(gps.lat, gps.latRef);
+	let lon = gpsformat(gps.lon, gps.lonRef);
+	return " (" + lat + ", " + lon +")*";
+}
+
+function dateformat(date) {
+	if (!date) return 'N/A';
+	let dateArray = date.split(':');
+	return dateArray[1] + "/" + dateArray[2] + "/" + dateArray[0];
+}
+</script>
+</body>
+</html>
