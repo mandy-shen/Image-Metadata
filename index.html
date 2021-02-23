@@ -32,7 +32,7 @@ let start;
 let cnt = 0;
 let map = new Map();
 
-async function readURL(input) {
+let readURL = async function(input) {
 
 	const label = $("<label class=left></label>");
 	const text = $("<text></text>");
@@ -87,19 +87,23 @@ async function readURL(input) {
 				$("#gpsFull"+i).html(gpsFullformat(gps));
 				$("#loc"+i).html(await fetchLoc(gps));
 				
-				let gpsDateStamp = EXIF.getTag(this, "GPSDateStamp");
-				$("#date"+i).html(dateformat(gpsDateStamp));
+				let datetime = EXIF.getTag(this, "DateTime");
+				$("#date"+i).html(dateformat(datetime));
 				
 				let make  = EXIF.getTag(this, "Make");
 				let model = EXIF.getTag(this, "Model");
 				$("#device"+i).html(make + " " + model);
+				
+				let allMetaData = EXIF.getAllTags(this);
+				let allMetaDataStr = JSON.stringify(allMetaData, null, "\t");
+				show.append("<pre>allMetaData: "+ allMetaDataStr + "</pre>");
 
 				(++cnt);
 				if (cnt>=input.files.length) {
 					let time = new Date().getTime() - start;
 					alert('total time consuming: ' + time + 'ms'
 						+ '\ntotal photo: ' + input.files.length
-						+ '\neach photo: ' + time/input.files.length + 'ms');
+						+ '\neach photo: ' + (time/input.files.length).toFixed(4) + 'ms');
 				}
 			});
 		});
@@ -114,20 +118,37 @@ $("#imgInp").change(function() {
 });
 
 // google
-async function fetchLoc(gps) {
+let fetchLoc = async function(gps) {
 	let latnum = gpsDegToDeci(gps.lat, gps.latRef);
 	let lonnum = gpsDegToDeci(gps.lon, gps.lonRef);
+	
+	if (latnum == '' || lonnum == '')
+		return 'N/A';
+	
 	let querystr = latnum+","+lonnum;
 	
 	if (map[querystr])
 		return map[querystr];
 	
-	let url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+querystr+"&location_type=APPROXIMATE&result_type=administrative_area_level_1&key=AIzaSyBYZjMLCyHXBvhFlRQhDHITdAbLle5j0uE";
+	let url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+querystr+"&location_type=ROOFTOP&key=AIzaSyBYZjMLCyHXBvhFlRQhDHITdAbLle5j0uE";
 	let response = await fetch(url);
 	let json = await response.json();
+	
+	if (!json.results || json.results.length == 0)
+		return 'N/A';
 
-	let loc = json.results[0].formatted_address;
+	let tmp = json.plus_code.compound_code;
+	let bloc = tmp.split(','); // country
+	let loc = '';
+	if (bloc.length >= 3)
+		loc = (bloc[bloc.length-2] + ', ' + bloc[bloc.length-1]).trim();
+	else {
+		let sloc = bloc[bloc.length-2].split(' '); //city
+		loc = sloc[sloc.length-1] + ', ' + bloc[bloc.length-1];
+	}
+
 	map[querystr] = loc;
+	
 	return loc;
 }
 
@@ -137,26 +158,34 @@ Number.prototype.pad = function(size) {
 	return str;
 }
 
-function gpsDegToDeci(array, ref) {
+let gpsDegToDeci = function(array, ref) {
+	if (!ref || !array || array.length!=3)
+		return '';
 	let min = array[1] + array[2]/60;
 	let decimal = (array[0] + min/60).toFixed(4);
 	return (ref=='N'||ref=='E') ? decimal : decimal*(-1);
 }
 
-function gpsformat(array, ref) {
+let gpsformat = function(array, ref) {
+	if (!ref || !array || array.length!=3)
+		return '';
 	let gpsnum = gpsDegToDeci(array, ref);
 	return Math.abs(gpsnum) + "° " + ref;
 }
 
-function gpsFullformat(gps) {
+let gpsFullformat = function(gps) {
 	let lat = gpsformat(gps.lat, gps.latRef);
 	let lon = gpsformat(gps.lon, gps.lonRef);
+	
+	if (lat == '' || lon == '')
+		return '';
 	return " (" + lat + ", " + lon +")*";
 }
 
-function dateformat(date) {
+let dateformat = function(date) {
 	if (!date) return 'N/A';
-	let dateArray = date.split(':');
+	let tmp = date.split(' ');
+	let dateArray = tmp[0].split(':');
 	return dateArray[1] + "/" + dateArray[2] + "/" + dateArray[0];
 }
 </script>
