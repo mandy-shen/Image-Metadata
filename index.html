@@ -95,8 +95,12 @@ async function readURL(input) {
 				$("#device"+i).html(make + " " + model);
 
 				(++cnt);
-				if (cnt>=input.files.length)
-					console.log('time:', new Date().getTime() - start);
+				if (cnt>=input.files.length) {
+					let time = new Date().getTime() - start;
+					alert('total time consuming: ', time, 
+						'\ntotal photo: ', input.files.length, 
+						'\neach photo: ', time/input.files.length);
+				}
 			});
 		});
 
