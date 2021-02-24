@@ -28,8 +28,6 @@ img {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
 <script>
-let start;
-let cnt = 0;
 let map = new Map();
 
 let readURL = async function(input) {
@@ -43,7 +41,6 @@ let readURL = async function(input) {
 	const temp = p.clone();
 	
 	$("#show p").remove();
-	cnt = 0;
 
     if (input.files) {
 
@@ -76,8 +73,7 @@ let readURL = async function(input) {
 			let reader = new FileReader();
 			reader.onload = (e) => {$("#img"+i).attr("src", e.target.result)};
 			reader.readAsDataURL(file);
-			
-			
+						
 			EXIF.getData(file, async function() {
 				let gps = {};
 				gps.lat    = EXIF.getTag(this, "GPSLatitude");
@@ -94,17 +90,11 @@ let readURL = async function(input) {
 				let model = EXIF.getTag(this, "Model");
 				$("#device"+i).html(make + " " + model);
 				
+				/*
 				let allMetaData = EXIF.getAllTags(this);
 				let allMetaDataStr = JSON.stringify(allMetaData, null, "\t");
 				show.append("<pre>allMetaData: "+ allMetaDataStr + "</pre>");
-
-				(++cnt);
-				if (cnt>=input.files.length) {
-					let time = new Date().getTime() - start;
-					alert('total time consuming: ' + time + 'ms'
-						+ '\ntotal photo: ' + input.files.length
-						+ '\neach photo: ' + (time/input.files.length).toFixed(4) + 'ms');
-				}
+				*/
 			});
 		});
 
@@ -113,8 +103,10 @@ let readURL = async function(input) {
 }
 
 $("#imgInp").change(function() {
-	start = new Date().getTime();
+	let label = 'calcTime';
+	console.time(label);
 	readURL(this);
+	console.timeEnd(label);
 });
 
 // google
