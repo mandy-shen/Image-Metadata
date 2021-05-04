@@ -4,7 +4,7 @@
 * browser (eg. Chrome, firefox, Safari)
 * AWS account
 * genRetrivePhotoWeb.yaml
-* lots of photos (img.zip)
+* lots of photos (img9.zip)
 
 ## create a stack
 1. open browser, login to AWS.
