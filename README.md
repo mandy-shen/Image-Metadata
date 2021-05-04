@@ -38,4 +38,4 @@
 
 * ps. location could be showed slower.
 
-![](https://github.com/mandy-shen/image-metadata/blob/main/Screen%20Shot_900photo.png?raw=true)
+![](https://github.com/mandy-shen/image-metadata/blob/main/Screen%20Shot_900photo.png?raw=true&s=100)
