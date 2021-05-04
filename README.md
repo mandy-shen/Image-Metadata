@@ -37,4 +37,4 @@
 3. see Screen Shot_9.PNG or Screen Shot_900photo.PNG.
 ps. location could be showed slower.
 
-![](https://github.com/mandy-shen/image-metadata/blob/main/Screen%20Shot_900photo.png?raw=true | width=50)
+![](https://github.com/mandy-shen/image-metadata/blob/main/Screen%20Shot_900photo.png?raw=true|width=50)
