@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  BucketName:
+    Type: String
+
+Resources:
+  deploytos3:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      CodeUri: 's3://htmlformation/lambdaDeploy.zip'
+      MemorySize: 512
+      Timeout: 300
+      Environment:
+        Variables:
+          TEST: WORKS
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AmazonS3FullAccess
+  DeploymentCustomResource:
+    Type: Custom::deploytos3
+    Properties:
+      ServiceToken: !GetAtt deploytos3.Arn
+      url: 'https://raw.githubusercontent.com/mandy-shen/tmp/main/index.html'
+      bucketname: !Ref BucketName
+
+Outputs:
+  WebURL:
+    Value:
+      Fn::Join:
+        - ''
+        - - 'https://s3.amazonaws.com/'
+          - Fn::GetAtt:
+            - DeploymentCustomResource  
+            - bucketname
+          - '/index.html'
