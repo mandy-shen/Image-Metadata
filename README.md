@@ -34,7 +34,7 @@
 ## How to retrieve photos' metadata
 1. click "Choose Files" to upload all the photos you have.
 2. wait for all the photos retieved in the "Show Images:" section.
-3. see Screen Shot_9.PNG or ![Screen Shot_900photo.PNG](https://github.com/mandy-shen/image-metadata/blob/master/Screen Shot_900photo.PNG?raw=true)
+3. see Screen Shot_9.PNG or ![Screen Shot_900photo.PNG](https://github.com/mandy-shen/image-metadata/blob/main/Screen Shot_900photo.PNG?raw=true)
 ps. location could be showed slower.
 
 
