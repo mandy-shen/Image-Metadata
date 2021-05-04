@@ -33,7 +33,6 @@
 
 ## How to retrieve photos' metadata
 1. click "Choose Files" to upload all the photos you have.
-    * this is the web link I made: (https://s3.amazonaws.com/testdemoasgn2xxb/index.html)
 2. wait for all the photos retieved in the "Show Images:" section.
-3. see Capture.PNG or Screen Shot_900photo.PNG
+3. see Screen Shot_9.PNG or Screen Shot_900photo.PNG
 ps. location could be showed slower.
