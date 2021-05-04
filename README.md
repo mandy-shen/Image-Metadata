@@ -1,4 +1,5 @@
 # image-metadata
+retrieve image's location in seconds with google map API and exif-js
 
 ## required
 * browser (eg. Chrome, firefox, Safari)
