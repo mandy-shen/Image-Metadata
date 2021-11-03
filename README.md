@@ -1,4 +1,4 @@
-# Image-metadata
+# Image-Metadata
 Retrieve location of large images and response near real-time with Google Map API and exif-js.
 
 ## required
